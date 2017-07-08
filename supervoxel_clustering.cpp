@@ -41,27 +41,27 @@ main (int argc, char ** argv)
     return (1);
   }
 
-
+//与点云是否为结构点云有关
   bool use_transform = ! pcl::console::find_switch (argc, argv, "--NT");
-
+//体素的大小,单位米
   float voxel_resolution = 0.008f;
   bool voxel_res_specified = pcl::console::find_switch (argc, argv, "-v");
   if (voxel_res_specified)
     pcl::console::parse (argc, argv, "-v", voxel_resolution);
-
+//超像素的大小,单位米
   float seed_resolution = 0.1f;
   bool seed_res_specified = pcl::console::find_switch (argc, argv, "-s");
   if (seed_res_specified)
     pcl::console::parse (argc, argv, "-s", seed_resolution);
-
+//颜色对于超体聚类的影响
   float color_importance = 0.2f;
   if (pcl::console::find_switch (argc, argv, "-c"))
     pcl::console::parse (argc, argv, "-c", color_importance);
-
+//设置空间形状的影响,其值越大,超体素形状越规则,其值越小,超体素形状越不规则,受法向量和颜色的影响越大.
   float spatial_importance = 0.4f;
   if (pcl::console::find_switch (argc, argv, "-z"))
     pcl::console::parse (argc, argv, "-z", spatial_importance);
-
+//设置法向量的影响
   float normal_importance = 1.0f;
   if (pcl::console::find_switch (argc, argv, "-n"))
     pcl::console::parse (argc, argv, "-n", normal_importance);
@@ -75,7 +75,7 @@ main (int argc, char ** argv)
   super.setColorImportance (color_importance);
   super.setSpatialImportance (spatial_importance);
   super.setNormalImportance (normal_importance);
-
+                                                                                                                                                                                                                                                                  
   std::map <uint32_t, pcl::Supervoxel<PointT>::Ptr > supervoxel_clusters;
 
   pcl::console::print_highlight ("Extracting supervoxels!\n");
@@ -84,7 +84,7 @@ main (int argc, char ** argv)
 
   boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer (new pcl::visualization::PCLVisualizer ("3D Viewer"));
   viewer->setBackgroundColor (0, 0, 0);
-
+  viewer->addCoordinateSystem (1.0);
   PointCloudT::Ptr voxel_centroid_cloud = super.getVoxelCentroidCloud ();
   viewer->addPointCloud (voxel_centroid_cloud, "voxel centroids");
   viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE,2.0, "voxel centroids");
@@ -96,7 +96,7 @@ main (int argc, char ** argv)
 
   PointNCloudT::Ptr sv_normal_cloud = super.makeSupervoxelNormalCloud (supervoxel_clusters);
   //We have this disabled so graph is easy to see, uncomment to see supervoxel normals
-  //viewer->addPointCloudNormals<PointNormal> (sv_normal_cloud,1,0.05f, "supervoxel_normals");
+  viewer->addPointCloudNormals<PointNT> (sv_normal_cloud,1,0.05f, "supervoxel_normals");
 
   pcl::console::print_highlight ("Getting supervoxel adjacency\n");
   std::multimap<uint32_t, uint32_t> supervoxel_adjacency;
