@@ -12,12 +12,12 @@ typedef pcl::PointNormal PointNT;
 typedef pcl::PointCloud<PointNT> PointNCloudT;
 typedef pcl::PointXYZL PointLT;
 typedef pcl::PointCloud<PointLT> PointLCloudT;
-
+/*
 void addSupervoxelConnectionsToViewer (PointT &supervoxel_center,
                                        PointCloudT &adjacent_supervoxel_centers,
                                        std::string supervoxel_name,
                                        boost::shared_ptr<pcl::visualization::PCLVisualizer> & viewer);
-
+*/
 
 int
 main (int argc, char ** argv)
@@ -89,15 +89,15 @@ main (int argc, char ** argv)
   viewer->addPointCloud (voxel_centroid_cloud, "voxel centroids");
   viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE,2.0, "voxel centroids");
   viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_OPACITY,0.95, "voxel centroids");
-
-  PointCloudT::Ptr colored_voxel_cloud = super.getColoredVoxelCloud ();
+//为每一块超体素用不同的颜色区分，注释掉后会显示原始的点云
+ /* PointCloudT::Ptr colored_voxel_cloud = super.getColoredVoxelCloud ();
   viewer->addPointCloud (colored_voxel_cloud, "colored voxels");
   viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_OPACITY,0.8, "colored voxels");
-
+*/
   PointNCloudT::Ptr sv_normal_cloud = super.makeSupervoxelNormalCloud (supervoxel_clusters);
   //We have this disabled so graph is easy to see, uncomment to see supervoxel normals
   viewer->addPointCloudNormals<PointNT> (sv_normal_cloud,1,0.05f, "supervoxel_normals");
-
+/*
   pcl::console::print_highlight ("Getting supervoxel adjacency\n");
   std::multimap<uint32_t, uint32_t> supervoxel_adjacency;
   super.getSupervoxelAdjacency (supervoxel_adjacency);
@@ -126,14 +126,14 @@ main (int argc, char ** argv)
     //Move iterator forward to next label
     label_itr = supervoxel_adjacency.upper_bound (supervoxel_label);
   }
-
+*/
   while (!viewer->wasStopped ())
   {
     viewer->spinOnce (100);
   }
   return (0);
 }
-
+/*
 void
 addSupervoxelConnectionsToViewer (PointT &supervoxel_center,
                                   PointCloudT &adjacent_supervoxel_centers,
@@ -163,5 +163,6 @@ addSupervoxelConnectionsToViewer (PointT &supervoxel_center,
   polyData->SetLines (cells);
   viewer->addModelFromPolyData (polyData,supervoxel_name);
 }
+*/
 
 
