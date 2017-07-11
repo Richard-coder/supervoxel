@@ -85,10 +85,13 @@ main (int argc, char ** argv)
   boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer (new pcl::visualization::PCLVisualizer ("3D Viewer"));
   viewer->setBackgroundColor (0, 0, 0);
   viewer->addCoordinateSystem (1.0);
+/*
+//显示原始的点云
   PointCloudT::Ptr voxel_centroid_cloud = super.getVoxelCentroidCloud ();
   viewer->addPointCloud (voxel_centroid_cloud, "voxel centroids");
   viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE,2.0, "voxel centroids");
   viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_OPACITY,0.95, "voxel centroids");
+/*
 //为每一块超体素用不同的颜色区分，注释掉后会显示原始的点云
  /* PointCloudT::Ptr colored_voxel_cloud = super.getColoredVoxelCloud ();
   viewer->addPointCloud (colored_voxel_cloud, "colored voxels");
@@ -97,6 +100,19 @@ main (int argc, char ** argv)
   PointNCloudT::Ptr sv_normal_cloud = super.makeSupervoxelNormalCloud (supervoxel_clusters);
   //We have this disabled so graph is easy to see, uncomment to see supervoxel normals
   viewer->addPointCloudNormals<PointNT> (sv_normal_cloud,1,0.05f, "supervoxel_normals");
+
+  std::map <uint32_t, pcl::Supervoxel<PointT>::Ptr >::iterator sv_itr=supervoxel_clusters.begin();
+  for(;sv_itr!=supervoxel_clusters.end();sv_itr++){
+    uint32_t label=sv_itr->first;
+    std::stringstream ss;
+    ss << label;
+    PointCloudT::Ptr voxel_cloud = supervoxel_clusters[label]->voxels_;
+    viewer->addPointCloud (voxel_cloud, ss.str());
+    viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE,2.0, ss.str());
+    viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_OPACITY,0.95, ss.str());
+    std::cout<<sv_itr->first<<std::endl;
+    viewer->spinOnce (50);
+  }
 /*
   pcl::console::print_highlight ("Getting supervoxel adjacency\n");
   std::multimap<uint32_t, uint32_t> supervoxel_adjacency;
