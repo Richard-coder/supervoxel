@@ -98,8 +98,8 @@ main (int argc, char ** argv)
   viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_OPACITY,0.8, "colored voxels");
 */
   PointNCloudT::Ptr sv_normal_cloud = super.makeSupervoxelNormalCloud (supervoxel_clusters);
-  //We have this disabled so graph is easy to see, uncomment to see supervoxel normals
-  viewer->addPointCloudNormals<PointNT> (sv_normal_cloud,1,0.05f, "supervoxel_normals");
+  //显示超体素中心点的法向量
+  //viewer->addPointCloudNormals<PointNT> (sv_normal_cloud,1,0.05f, "supervoxel_normals");
 
   std::map <uint32_t, pcl::Supervoxel<PointT>::Ptr >::iterator sv_itr=supervoxel_clusters.begin();
   for(;sv_itr!=supervoxel_clusters.end();sv_itr++){
@@ -107,11 +107,13 @@ main (int argc, char ** argv)
     std::stringstream ss;
     ss << label;
     PointCloudT::Ptr voxel_cloud = supervoxel_clusters[label]->voxels_;
-    viewer->addPointCloud (voxel_cloud, ss.str());
-    viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE,2.0, ss.str());
-    viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_OPACITY,0.95, ss.str());
-    std::cout<<sv_itr->first<<std::endl;
-    viewer->spinOnce (50);
+    if((*(supervoxel_clusters[label]->voxels_)).size()>3){
+      viewer->addPointCloud(voxel_cloud, ss.str());
+      viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 2.0, ss.str());
+      viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_OPACITY, 0.95, ss.str());
+    }
+    ///std::cout<<(*(supervoxel_clusters[label]->voxels_)).size()<<std::endl;
+    //viewer->spinOnce (50);
   }
 /*
   pcl::console::print_highlight ("Getting supervoxel adjacency\n");
