@@ -19,6 +19,31 @@ void addSupervoxelConnectionsToViewer (PointT &supervoxel_center,
                                        boost::shared_ptr<pcl::visualization::PCLVisualizer> & viewer);
 */
 
+
+  namespace pcl{
+  template <typename PointT> inline void
+  computePointNormal (const pcl::PointCloud<PointT> &cloud,
+                      Eigen::Matrix3f &covariance_matrix,
+                      Eigen::Vector4f &plane_parameters, float &curvature)
+  {
+    // Placeholder for the 3x3 covariance matrix at each surface patch
+    //EIGEN_ALIGN16 Eigen::Matrix3f covariance_matrix;
+    // 16-bytes aligned placeholder for the XYZ centroid of a surface patch
+    Eigen::Vector4f xyz_centroid;
+
+    if (cloud.size () < 3 ||
+        computeMeanAndCovarianceMatrix (cloud, covariance_matrix, xyz_centroid) == 0)
+    {
+      plane_parameters.setConstant (std::numeric_limits<float>::quiet_NaN ());
+      curvature = std::numeric_limits<float>::quiet_NaN ();
+      return;
+    }
+
+    // Get the plane normal and surface curvature
+    solvePlaneParameters (covariance_matrix, xyz_centroid, plane_parameters, curvature);
+  }
+}
+
 int
 main (int argc, char ** argv)
 {
@@ -104,6 +129,17 @@ main (int argc, char ** argv)
   std::map <uint32_t, pcl::Supervoxel<PointT>::Ptr >::iterator sv_itr=supervoxel_clusters.begin();
   for(;sv_itr!=supervoxel_clusters.end();sv_itr++){
     uint32_t label=sv_itr->first;
+    if((*(supervoxel_clusters[label]->voxels_)).size()>20){
+      EIGEN_ALIGN16 Eigen::Matrix3f covariance_matrix;
+      Eigen::Vector4f normal_;
+      float curvature_;
+      pcl::computePointNormal (*(supervoxel_clusters[label]->voxels_), covariance_matrix, normal_, curvature_);
+      std::cout<<covariance_matrix<<std::endl;
+      std::cout<<normal_<<std::endl;
+      std::cout<<curvature_<<std::endl;
+      break;
+    }
+    //显示点云
     std::stringstream ss;
     ss << label;
     PointCloudT::Ptr voxel_cloud = supervoxel_clusters[label]->voxels_;
@@ -151,6 +187,8 @@ main (int argc, char ** argv)
   }
   return (0);
 }
+
+
 /*
 void
 addSupervoxelConnectionsToViewer (PointT &supervoxel_center,
