@@ -21,9 +21,60 @@ void addSupervoxelConnectionsToViewer (PointT &supervoxel_center,
 
 
   namespace pcl{
+
+inline void
+solvePlaneParameters (const Eigen::Matrix3f &covariance_matrix,
+                            Eigen::Vector3f::Scalar &eigen_value,
+                           float &nx, float &ny, float &nz, float &curvature)
+{
+  // Avoid getting hung on Eigen's optimizers
+//  for (int i = 0; i < 9; ++i)
+//    if (!pcl_isfinite (covariance_matrix.coeff (i)))
+//    {
+//      //PCL_WARN ("[pcl::solvePlaneParameteres] Covariance matrix has NaN/Inf values!\n");
+//      nx = ny = nz = curvature = std::numeric_limits<float>::quiet_NaN ();
+//      return;
+//    }
+  // Extract the smallest eigenvalue and its eigenvector
+
+  //EIGEN_ALIGN16 Eigen::Vector3f::Scalar eigen_value;
+  EIGEN_ALIGN16 Eigen::Vector3f eigen_vector;
+  pcl::eigen33 (covariance_matrix, eigen_value, eigen_vector);
+
+  nx = eigen_vector [0];
+  ny = eigen_vector [1];
+  nz = eigen_vector [2];
+
+  // Compute the curvature surface change
+  float eig_sum = covariance_matrix.coeff (0) + covariance_matrix.coeff (4) + covariance_matrix.coeff (8);
+/*
+  std::cout<<covariance_matrix.coeff (0)<<"\t"<<covariance_matrix.coeff (4)<<"\t"<<covariance_matrix.coeff (8)<<"\t"<<std::endl<<std::endl;
+  std::cout<<covariance_matrix<<std::endl<<std::endl;
+  */
+  if (eig_sum != 0)
+    curvature = fabsf (eigen_value / eig_sum);
+  else
+    curvature = 0;
+}
+
+inline void
+solvePlaneParameters (const Eigen::Matrix3f &covariance_matrix,
+                            Eigen::Vector3f::Scalar &eigen_value,
+                           const Eigen::Vector4f &point,
+                           Eigen::Vector4f &plane_parameters, float &curvature)
+{
+  solvePlaneParameters (covariance_matrix, eigen_value, plane_parameters [0], plane_parameters [1], plane_parameters [2], curvature);
+
+  plane_parameters[3] = 0;
+  // Hessian form (D = nc . p_plane (centroid here) + p)
+  plane_parameters[3] = -1 * plane_parameters.dot (point);
+}
+
+
   template <typename PointT> inline void
   computePointNormal (const pcl::PointCloud<PointT> &cloud,
                       Eigen::Matrix3f &covariance_matrix,
+                      Eigen::Vector3f::Scalar &eigen_value,
                       Eigen::Vector4f &plane_parameters, float &curvature)
   {
     // Placeholder for the 3x3 covariance matrix at each surface patch
@@ -40,7 +91,7 @@ void addSupervoxelConnectionsToViewer (PointT &supervoxel_center,
     }
 
     // Get the plane normal and surface curvature
-    solvePlaneParameters (covariance_matrix, xyz_centroid, plane_parameters, curvature);
+    solvePlaneParameters (covariance_matrix, eigen_value, xyz_centroid, plane_parameters, curvature);
   }
 }
 
@@ -131,12 +182,27 @@ main (int argc, char ** argv)
     uint32_t label=sv_itr->first;
     if((*(supervoxel_clusters[label]->voxels_)).size()>20){
       EIGEN_ALIGN16 Eigen::Matrix3f covariance_matrix;
+      EIGEN_ALIGN16 Eigen::Vector3f::Scalar eigen_value;
       Eigen::Vector4f normal_;
       float curvature_;
-      pcl::computePointNormal (*(supervoxel_clusters[label]->voxels_), covariance_matrix, normal_, curvature_);
+      pcl::computePointNormal (*(supervoxel_clusters[label]->voxels_), covariance_matrix, eigen_value, normal_, curvature_);
+      
       std::cout<<covariance_matrix<<std::endl;
+      /*
       std::cout<<normal_<<std::endl;
       std::cout<<curvature_<<std::endl;
+      */
+      std::cout<<eigen_value<<std::endl;
+
+    Eigen::EigenSolver<Eigen::Matrix3f> es(covariance_matrix);
+
+    Eigen::Matrix3f D = es.pseudoEigenvalueMatrix();
+    Eigen::Matrix3f V = es.pseudoEigenvectors();
+    std::cout << "The pseudo-eigenvalue matrix D is:" << std::endl << D << std::endl;
+    std::cout << "The pseudo-eigenvector matrix V is:" << std::endl << V << std::endl;
+    std::cout << "Finally, V * D * V^(-1) = " << std::endl << V * D * V.inverse() << std::endl;
+
+
       break;
     }
     //显示点云
