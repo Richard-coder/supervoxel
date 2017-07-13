@@ -150,6 +150,13 @@ main (int argc, char ** argv)
       std::cout << "The pseudo-eigenvector matrix V is:" << std::endl << V << std::endl;
       std::cout << "Finally, V * D * V^(-1) = " << std::endl << V * D * V.inverse() << std::endl;
 
+      Eigen::Vector4f test;
+
+      test<<11.5,112.5,63.5,1.85;
+
+      std::sort(test.data(),test.data()+test.size());
+
+      std::cout<<test<<std::endl;
 
 
       break;

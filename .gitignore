@@ -10,3 +10,4 @@ compile_commands.json
 CTestTestfile.cmake
 supervoxel_clustering
 libfeature.a
+.vscode/settings.json
