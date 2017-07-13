@@ -135,8 +135,20 @@ main (int argc, char ** argv)
       float curvature_;
       pcl::computePointNormal (*(supervoxel_clusters[label]->voxels_), covariance_matrix, normal_, curvature_);
       std::cout<<covariance_matrix<<std::endl;
+      /*
       std::cout<<normal_<<std::endl;
       std::cout<<curvature_<<std::endl;
+      */
+      Eigen::EigenSolver<Eigen::Matrix3f> es(covariance_matrix);
+
+      Eigen::Matrix3f D = es.pseudoEigenvalueMatrix();
+      Eigen::Matrix3f V = es.pseudoEigenvectors();
+      std::cout << "The pseudo-eigenvalue matrix D is:" << std::endl << D << std::endl;
+      std::cout << "The pseudo-eigenvector matrix V is:" << std::endl << V << std::endl;
+      std::cout << "Finally, V * D * V^(-1) = " << std::endl << V * D * V.inverse() << std::endl;
+
+
+
       break;
     }
     //显示点云
