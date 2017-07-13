@@ -8,5 +8,11 @@ include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
+ADD_LIBRARY( feature feature.cpp )
+target_link_libraries(feature 
+${PCL_LIBRARIES})
+
 add_executable (supervoxel_clustering supervoxel_clustering.cpp)
-target_link_libraries (supervoxel_clustering ${PCL_LIBRARIES}) 
+target_link_libraries (supervoxel_clustering 
+feature
+${PCL_LIBRARIES}) 

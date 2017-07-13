@@ -5,6 +5,9 @@
 #include <pcl/visualization/pcl_visualizer.h>
 #include <pcl/segmentation/supervoxel_clustering.h>
 #include <vtkPolyLine.h>
+
+#include "feature.h"
+
 // Types
 typedef pcl::PointXYZRGBA PointT;
 typedef pcl::PointCloud<PointT> PointCloudT;
