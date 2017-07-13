@@ -8,6 +8,8 @@ include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/. )#设定头文件目录
+
 ADD_LIBRARY( feature feature.cpp )
 target_link_libraries(feature 
 ${PCL_LIBRARIES})

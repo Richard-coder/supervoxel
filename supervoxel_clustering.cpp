@@ -22,7 +22,7 @@ void addSupervoxelConnectionsToViewer (PointT &supervoxel_center,
                                        boost::shared_ptr<pcl::visualization::PCLVisualizer> & viewer);
 */
 
-
+/*
   namespace pcl{
   template <typename PointT> inline void
   computePointNormal (const pcl::PointCloud<PointT> &cloud,
@@ -46,7 +46,7 @@ void addSupervoxelConnectionsToViewer (PointT &supervoxel_center,
     solvePlaneParameters (covariance_matrix, xyz_centroid, plane_parameters, curvature);
   }
 }
-
+*/
 int
 main (int argc, char ** argv)
 {
@@ -133,15 +133,13 @@ main (int argc, char ** argv)
   for(;sv_itr!=supervoxel_clusters.end();sv_itr++){
     uint32_t label=sv_itr->first;
     if((*(supervoxel_clusters[label]->voxels_)).size()>20){
+      /*
       EIGEN_ALIGN16 Eigen::Matrix3f covariance_matrix;
       Eigen::Vector4f normal_;
       float curvature_;
       pcl::computePointNormal (*(supervoxel_clusters[label]->voxels_), covariance_matrix, normal_, curvature_);
       std::cout<<covariance_matrix<<std::endl;
-      /*
-      std::cout<<normal_<<std::endl;
-      std::cout<<curvature_<<std::endl;
-      */
+
       Eigen::EigenSolver<Eigen::Matrix3f> es(covariance_matrix);
 
       Eigen::Matrix3f D = es.pseudoEigenvalueMatrix();
@@ -157,7 +155,9 @@ main (int argc, char ** argv)
       std::sort(test.data(),test.data()+test.size());
 
       std::cout<<test<<std::endl;
-
+*/
+      Feature feature;
+      feature.getLamda(*(supervoxel_clusters[label]->voxels_));
 
       break;
     }
