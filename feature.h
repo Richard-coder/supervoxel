@@ -26,6 +26,8 @@ public:
   void getHeight(const pcl::PointCloud<pcl::PointXYZRGBA> &cloud);
 
   void getLab(const pcl::PointCloud<pcl::PointXYZRGBA> &cloud);
+  
+  Eigen::Matrix<float, 14, 1> getFeature();
 
 private:
   Eigen::Vector3f

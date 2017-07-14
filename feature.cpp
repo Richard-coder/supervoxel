@@ -139,6 +139,16 @@ void Feature::getLab(const pcl::PointCloud<pcl::PointXYZRGBA> &cloud)
 */
 }
 
+Eigen::Matrix<float, 14, 1> Feature::getFeature(){
+    Eigen::Matrix<float, 14, 1> feature;
+    feature<<lamda_[0],lamda_[1]-lamda_[0],lamda_[2]-lamda_[1],
+             angel_[0],angel_[1],
+             height_[0],height_[1],height_[2],
+             lab_[0],lab_[1],lab_[2],lab_[3],lab_[4],lab_[5];
+    return feature;
+}
+
+
 Eigen::Vector3f
 Feature::RGB2Lab(const Eigen::Vector3i &colorRGB)
 {

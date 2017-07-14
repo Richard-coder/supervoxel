@@ -130,38 +130,17 @@ main (int argc, char ** argv)
   //viewer->addPointCloudNormals<PointNT> (sv_normal_cloud,1,0.05f, "supervoxel_normals");
 
   std::map <uint32_t, pcl::Supervoxel<PointT>::Ptr >::iterator sv_itr=supervoxel_clusters.begin();
+  std::map <uint32_t, Eigen::Matrix<float, 14, 1> > features;
   for(;sv_itr!=supervoxel_clusters.end();sv_itr++){
     uint32_t label=sv_itr->first;
     if((*(supervoxel_clusters[label]->voxels_)).size()>20){
-      /*
-      EIGEN_ALIGN16 Eigen::Matrix3f covariance_matrix;
-      Eigen::Vector4f normal_;
-      float curvature_;
-      pcl::computePointNormal (*(supervoxel_clusters[label]->voxels_), covariance_matrix, normal_, curvature_);
-      std::cout<<covariance_matrix<<std::endl;
-
-      Eigen::EigenSolver<Eigen::Matrix3f> es(covariance_matrix);
-
-      Eigen::Matrix3f D = es.pseudoEigenvalueMatrix();
-      Eigen::Matrix3f V = es.pseudoEigenvectors();
-      std::cout << "The pseudo-eigenvalue matrix D is:" << std::endl << D << std::endl;
-      std::cout << "The pseudo-eigenvector matrix V is:" << std::endl << V << std::endl;
-      std::cout << "Finally, V * D * V^(-1) = " << std::endl << V * D * V.inverse() << std::endl;
-
-      Eigen::Vector4f test;
-
-      test<<11.5,112.5,63.5,1.85;
-
-      std::sort(test.data(),test.data()+test.size());
-
-      std::cout<<test<<std::endl;
-*/
       Feature feature;
       feature.getLamda(*(supervoxel_clusters[label]->voxels_));
       feature.getAngel(*(supervoxel_clusters[label]->normals_));
       feature.getHeight(*(supervoxel_clusters[label]->voxels_));
       feature.getLab(*(supervoxel_clusters[label]->voxels_));
-
+      features[1]=feature.getFeature();
+      std::cout<<features[1]<<std::endl;
       break;
     }
     //显示点云
