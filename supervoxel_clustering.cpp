@@ -47,115 +47,124 @@ void addSupervoxelConnectionsToViewer (PointT &supervoxel_center,
   }
 }
 */
-int
-main (int argc, char ** argv)
+int main(int argc, char **argv)
 {
   if (argc < 2)
   {
-    pcl::console::print_error ("Syntax is: %s <pcd-file> \n "
-                                "--NT Dsables the single cloud transform \n"
-                                "-v <voxel resolution>\n-s <seed resolution>\n"
-                                "-c <color weight> \n-z <spatial weight> \n"
-                                "-n <normal_weight>\n", argv[0]);
+    pcl::console::print_error("Syntax is: %s <pcd-file> \n "
+                              "--NT Dsables the single cloud transform \n"
+                              "-v <voxel resolution>\n-s <seed resolution>\n"
+                              "-c <color weight> \n-z <spatial weight> \n"
+                              "-n <normal_weight>\n",
+                              argv[0]);
     return (1);
   }
 
-
-  PointCloudT::Ptr cloud = boost::make_shared <PointCloudT> ();
-  pcl::console::print_highlight ("Loading point cloud...\n");
-  if (pcl::io::loadPCDFile<PointT> (argv[1], *cloud))
+  PointCloudT::Ptr cloud = boost::make_shared<PointCloudT>();
+  pcl::console::print_highlight("Loading point cloud...\n");
+  if (pcl::io::loadPCDFile<PointT>(argv[1], *cloud))
   {
-    pcl::console::print_error ("Error loading cloud file!\n");
+    pcl::console::print_error("Error loading cloud file!\n");
     return (1);
   }
 
-//与点云是否为结构点云有关
-  bool use_transform = ! pcl::console::find_switch (argc, argv, "--NT");
-//体素的大小,单位米
+  //与点云是否为结构点云有关
+  bool use_transform = !pcl::console::find_switch(argc, argv, "--NT");
+  //体素的大小,单位米
   float voxel_resolution = 0.008f;
-  bool voxel_res_specified = pcl::console::find_switch (argc, argv, "-v");
+  bool voxel_res_specified = pcl::console::find_switch(argc, argv, "-v");
   if (voxel_res_specified)
-    pcl::console::parse (argc, argv, "-v", voxel_resolution);
-//超像素的大小,单位米
+    pcl::console::parse(argc, argv, "-v", voxel_resolution);
+  //超像素的大小,单位米
   float seed_resolution = 0.1f;
-  bool seed_res_specified = pcl::console::find_switch (argc, argv, "-s");
+  bool seed_res_specified = pcl::console::find_switch(argc, argv, "-s");
   if (seed_res_specified)
-    pcl::console::parse (argc, argv, "-s", seed_resolution);
-//颜色对于超体聚类的影响
+    pcl::console::parse(argc, argv, "-s", seed_resolution);
+  //颜色对于超体聚类的影响
   float color_importance = 0.2f;
-  if (pcl::console::find_switch (argc, argv, "-c"))
-    pcl::console::parse (argc, argv, "-c", color_importance);
-//设置空间形状的影响,其值越大,超体素形状越规则,其值越小,超体素形状越不规则,受法向量和颜色的影响越大.
+  if (pcl::console::find_switch(argc, argv, "-c"))
+    pcl::console::parse(argc, argv, "-c", color_importance);
+  //设置空间形状的影响,其值越大,超体素形状越规则,其值越小,超体素形状越不规则,受法向量和颜色的影响越大.
   float spatial_importance = 0.4f;
-  if (pcl::console::find_switch (argc, argv, "-z"))
-    pcl::console::parse (argc, argv, "-z", spatial_importance);
-//设置法向量的影响
+  if (pcl::console::find_switch(argc, argv, "-z"))
+    pcl::console::parse(argc, argv, "-z", spatial_importance);
+  //设置法向量的影响
   float normal_importance = 1.0f;
-  if (pcl::console::find_switch (argc, argv, "-n"))
-    pcl::console::parse (argc, argv, "-n", normal_importance);
+  if (pcl::console::find_switch(argc, argv, "-n"))
+    pcl::console::parse(argc, argv, "-n", normal_importance);
 
   //////////////////////////////  //////////////////////////////
   ////// This is how to use supervoxels
   //////////////////////////////  //////////////////////////////
 
-  pcl::SupervoxelClustering<PointT> super (voxel_resolution, seed_resolution, use_transform);
-  super.setInputCloud (cloud);
-  super.setColorImportance (color_importance);
-  super.setSpatialImportance (spatial_importance);
-  super.setNormalImportance (normal_importance);
-                                                                                                                                                                                                                                                                  
-  std::map <uint32_t, pcl::Supervoxel<PointT>::Ptr > supervoxel_clusters;
+  pcl::SupervoxelClustering<PointT> super(voxel_resolution, seed_resolution, use_transform);
+  super.setInputCloud(cloud);
+  super.setColorImportance(color_importance);
+  super.setSpatialImportance(spatial_importance);
+  super.setNormalImportance(normal_importance);
 
-  pcl::console::print_highlight ("Extracting supervoxels!\n");
-  super.extract (supervoxel_clusters);
-  pcl::console::print_info ("Found %d supervoxels\n", supervoxel_clusters.size ());
+  std::map<uint32_t, pcl::Supervoxel<PointT>::Ptr> supervoxel_clusters;
 
-  boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer (new pcl::visualization::PCLVisualizer ("3D Viewer"));
-  viewer->setBackgroundColor (0, 0, 0);
-  viewer->addCoordinateSystem (1.0);
-/*
+  pcl::console::print_highlight("Extracting supervoxels!\n");
+  super.extract(supervoxel_clusters);
+  pcl::console::print_info("Found %d supervoxels\n", supervoxel_clusters.size());
+
+  boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer(new pcl::visualization::PCLVisualizer("3D Viewer"));
+  viewer->setBackgroundColor(0, 0, 0);
+  viewer->addCoordinateSystem(1.0);
+  /*
 //显示原始的点云
   PointCloudT::Ptr voxel_centroid_cloud = super.getVoxelCentroidCloud ();
   viewer->addPointCloud (voxel_centroid_cloud, "voxel centroids");
   viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE,2.0, "voxel centroids");
   viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_OPACITY,0.95, "voxel centroids");
-/*
+
 //为每一块超体素用不同的颜色区分，注释掉后会显示原始的点云
- /* PointCloudT::Ptr colored_voxel_cloud = super.getColoredVoxelCloud ();
+ PointCloudT::Ptr colored_voxel_cloud = super.getColoredVoxelCloud ();
   viewer->addPointCloud (colored_voxel_cloud, "colored voxels");
   viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_OPACITY,0.8, "colored voxels");
 */
-  PointNCloudT::Ptr sv_normal_cloud = super.makeSupervoxelNormalCloud (supervoxel_clusters);
+  PointNCloudT::Ptr sv_normal_cloud = super.makeSupervoxelNormalCloud(supervoxel_clusters);
   //显示超体素中心点的法向量
   //viewer->addPointCloudNormals<PointNT> (sv_normal_cloud,1,0.05f, "supervoxel_normals");
 
-  std::map <uint32_t, pcl::Supervoxel<PointT>::Ptr >::iterator sv_itr=supervoxel_clusters.begin();
-  std::map <uint32_t, Eigen::Matrix<float, 14, 1> > features;
-  for(;sv_itr!=supervoxel_clusters.end();sv_itr++){
-    uint32_t label=sv_itr->first;
-    if((*(supervoxel_clusters[label]->voxels_)).size()>20){
-      Feature feature;
-      feature.getLamda(*(supervoxel_clusters[label]->voxels_));
-      feature.getAngel(*(supervoxel_clusters[label]->normals_));
-      feature.getHeight(*(supervoxel_clusters[label]->voxels_));
-      feature.getLab(*(supervoxel_clusters[label]->voxels_));
-      features[1]=feature.getFeature();
-      std::cout<<features[1]<<std::endl;
-      break;
-    }
+  std::map<uint32_t, pcl::Supervoxel<PointT>::Ptr>::iterator sv_itr = supervoxel_clusters.begin();
+  std::map<uint32_t, Eigen::Matrix<float, 14, 1>> features;
+  for (; sv_itr != supervoxel_clusters.end(); sv_itr++)
+  {
+    uint32_t label = sv_itr->first;
+
+    Feature feature;
+    feature.getLamda(*(supervoxel_clusters[label]->voxels_));
+    feature.getAngel(*(supervoxel_clusters[label]->normals_));
+    feature.getHeight(*(supervoxel_clusters[label]->voxels_));
+    feature.getLab(*(supervoxel_clusters[label]->voxels_));
+    features[label] = feature.getFeature();
+
     //显示点云
     std::stringstream ss;
     ss << label;
     PointCloudT::Ptr voxel_cloud = supervoxel_clusters[label]->voxels_;
-    if((*(supervoxel_clusters[label]->voxels_)).size()>3){
-      viewer->addPointCloud(voxel_cloud, ss.str());
-      viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 2.0, ss.str());
-      viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_OPACITY, 0.95, ss.str());
-    }
+
+    viewer->addPointCloud(voxel_cloud, ss.str());
+    viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 2.0, ss.str());
+    viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_OPACITY, 0.95, ss.str());
+
     ///std::cout<<(*(supervoxel_clusters[label]->voxels_)).size()<<std::endl;
     //viewer->spinOnce (50);
   }
-/*
+  //所有超体素的特征向量计算结果输出测试
+  std::map<uint32_t, Eigen::Matrix<float, 14, 1>>::iterator ft_itr = features.begin();
+  for (; ft_itr != features.end(); ft_itr++)
+  {
+    uint32_t label = ft_itr->first;
+    std::cout << features[label].transpose() << std::endl;
+    std::cout << "------------------------------------------------------------------------------------------------------------------------------------------------------------------------" << std::endl;
+    
+  }
+  std::cout<<"特征向量个数\t"<<features.size()<<std::endl;
+
+  /*
   pcl::console::print_highlight ("Getting supervoxel adjacency\n");
   std::multimap<uint32_t, uint32_t> supervoxel_adjacency;
   super.getSupervoxelAdjacency (supervoxel_adjacency);
@@ -185,13 +194,12 @@ main (int argc, char ** argv)
     label_itr = supervoxel_adjacency.upper_bound (supervoxel_label);
   }
 */
-  while (!viewer->wasStopped ())
+  while (!viewer->wasStopped())
   {
-    viewer->spinOnce (100);
+    viewer->spinOnce(100);
   }
   return (0);
 }
-
 
 /*
 void
@@ -224,5 +232,3 @@ addSupervoxelConnectionsToViewer (PointT &supervoxel_center,
   viewer->addModelFromPolyData (polyData,supervoxel_name);
 }
 */
-
-
