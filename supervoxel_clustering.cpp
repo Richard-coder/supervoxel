@@ -158,6 +158,8 @@ main (int argc, char ** argv)
 */
       Feature feature;
       feature.getLamda(*(supervoxel_clusters[label]->voxels_));
+      feature.getAngel(*(supervoxel_clusters[label]->normals_));
+      feature.getHeight(*(supervoxel_clusters[label]->voxels_));
 
       break;
     }

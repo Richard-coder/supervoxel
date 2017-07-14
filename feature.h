@@ -5,7 +5,8 @@
 #include <pcl/point_types.h>
 #include <pcl/features/normal_3d.h>
 #include <pcl/pcl_base.h>
-
+#include <pcl/segmentation/boost.h>
+#include <vector>
 class Feature
 {
   public:
@@ -19,6 +20,10 @@ class Feature
     Eigen::Matrix<float, 6, 1> color_;
 
     void getLamda(const pcl::PointCloud<pcl::PointXYZRGBA> &cloud);
+
+    void getAngel(const pcl::PointCloud<pcl::Normal > &normals);
+
+    void getHeight(const pcl::PointCloud<pcl::PointXYZRGBA> &cloud);
 };
 
 #endif
