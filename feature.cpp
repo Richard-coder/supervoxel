@@ -65,42 +65,48 @@ void Feature::getAngel(const pcl::PointCloud<pcl::Normal> &normals)
     typename pcl::PointCloud<pcl::Normal>::const_iterator normal_itr = normals.begin();
     std::vector<float> angels;
     angels.resize(normals.size());
-    for (size_t i=0; normal_itr != normals.end(); normal_itr++,i++)
+    for (size_t i = 0; normal_itr != normals.end(); normal_itr++, i++)
     {
-        angels[i]=-normal_itr->normal_y;
+        angels[i] = -normal_itr->normal_y;
         //测试一下法向量是否已经归一化，即其模是否为1，验证后，已经归一化了
         // std::cout<<normal_itr->normal_x*normal_itr->normal_x+normal_itr->normal_y*normal_itr->normal_y+normal_itr->normal_z*normal_itr->normal_z<<std::endl;
     }
 
     //计算均值与方差
     angel_ = compute(angels);
-std::cout << "统计计算点的个数"<<":\t"<<angels.size() << std::endl;
-    std::cout << "角度的均值和方差"<<":\t"<<angel_ << std::endl;
-        std::cout<<"输出角度序列"<<std::endl;
-    for(int i=0;i<angels.size();i++){
-            std::cout<<angels[i]<<std::endl;
+    /*
+    std::cout << "统计计算点的个数"
+              << ":\t" << angels.size() << std::endl;
+    std::cout << "角度的均值和方差"
+              << ":\t" << angel_ << std::endl;
+    std::cout << "输出角度序列" << std::endl;
+    for (int i = 0; i < angels.size(); i++)
+    {
+        std::cout << angels[i] << std::endl;
     }
+    */
 }
 void Feature::getHeight(const pcl::PointCloud<pcl::PointXYZRGBA> &cloud)
 {
     std::vector<float> heights;
     heights.resize(cloud.size());
     typename pcl::PointCloud<pcl::PointXYZRGBA>::const_iterator cloud_itr = cloud.begin();
-    for (size_t i=0; cloud_itr != cloud.end(); cloud_itr++,i++)
+    for (size_t i = 0; cloud_itr != cloud.end(); cloud_itr++, i++)
     {
-        heights[i]=-cloud_itr->y;
+        heights[i] = -cloud_itr->y;
     }
     std::sort(heights.begin(), heights.end());
     height_ << heights[0], heights[(heights.size() - 1) / 2], heights[heights.size() - 1];
-
+    /*
     //测试计算结果
-    std::cout<<"高度的结果：\t"<<height_<<std::endl;
-    std::cout<<"计算点的个数：\t"<<heights.size()<<std::endl;
-    std::cout<<"输出高度序列"<<std::endl;
-    for(int i=0;i<heights.size();i++){
-            std::cout<<heights[i]<<std::endl;
+    std::cout << "高度的结果：\t" << height_ << std::endl;
+    std::cout << "计算点的个数：\t" << heights.size() << std::endl;
+    std::cout << "输出高度序列" << std::endl;
+    for (int i = 0; i < heights.size(); i++)
+    {
+        std::cout << heights[i] << std::endl;
     }
-    
+    */
 }
 
 void Feature::getLab(const pcl::PointCloud<pcl::PointXYZRGBA> &cloud)
@@ -111,22 +117,26 @@ void Feature::getLab(const pcl::PointCloud<pcl::PointXYZRGBA> &cloud)
     lab_map['b'].resize(cloud.size());
     Eigen::Vector3f singel_lab;
     typename pcl::PointCloud<pcl::PointXYZRGBA>::const_iterator cloud_itr = cloud.begin();
-    for (size_t i=0; cloud_itr != cloud.end(); cloud_itr++,i++)
+    for (size_t i = 0; cloud_itr != cloud.end(); cloud_itr++, i++)
     {
         singel_lab = RGB2Lab(cloud_itr->getRGBVector3i());
-        lab_map['l'][i]=singel_lab[0];
-       lab_map['a'][i]=singel_lab[1];
-        lab_map['b'][i]=singel_lab[2];
+        lab_map['l'][i] = singel_lab[0];
+        lab_map['a'][i] = singel_lab[1];
+        lab_map['b'][i] = singel_lab[2];
 
-        std::cout <<i<<"\t" <<singel_lab[0] << std::endl;
+       // std::cout << i << "\t" << singel_lab[0] << std::endl;
     }
     Eigen::Vector2f L = compute(lab_map['l']);
     Eigen::Vector2f A = compute(lab_map['a']);
     Eigen::Vector2f B = compute(lab_map['b']);
 
     lab_ << L[0], A[0], B[0], L[1], A[1], B[1];
-    std::cout <<"输出计算点的个数：\t"<< lab_map['l'].size()<< std::endl;
-    std::cout  <<"计算的颜色均值和方差：\t"<< lab_ << std::endl;
+
+    /*
+    std::cout << "输出计算点的个数：\t" << lab_map['l'].size() << std::endl;
+    std::cout << "计算的颜色均值和方差：\t" << lab_ << std::endl;
+
+*/
 }
 
 Eigen::Vector3f
@@ -214,5 +224,3 @@ Feature::compute(const std::vector<float> &vec_in)
 
     return res;
 }
-
-
