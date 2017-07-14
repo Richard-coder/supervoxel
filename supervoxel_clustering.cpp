@@ -153,6 +153,7 @@ int main(int argc, char **argv)
     ///std::cout<<(*(supervoxel_clusters[label]->voxels_)).size()<<std::endl;
     //viewer->spinOnce (50);
   }
+  /*
   //所有超体素的特征向量计算结果输出测试
   std::map<uint32_t, Eigen::Matrix<float, 14, 1>>::iterator ft_itr = features.begin();
   for (; ft_itr != features.end(); ft_itr++)
@@ -163,7 +164,7 @@ int main(int argc, char **argv)
     
   }
   std::cout<<"特征向量个数\t"<<features.size()<<std::endl;
-
+*/
   /*
   pcl::console::print_highlight ("Getting supervoxel adjacency\n");
   std::multimap<uint32_t, uint32_t> supervoxel_adjacency;
